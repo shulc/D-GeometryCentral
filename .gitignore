@@ -1,0 +1,12 @@
+build/
+.dub/
+*.o
+*.a
+*.so
+*.dylib
+docs/
+docs.json
+__dummy.html
+geodesic
+*-test-library
+*-test-unittest

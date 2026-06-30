@@ -1,0 +1,36 @@
+{
+    "name": "d-geometrycentral",
+    "description": "D bindings for a thin C shim around geometry-central — heat-method geodesics, disk parameterization, and cotan-Laplacian smoothing.",
+    "license": "MIT",
+    "authors": ["Alexander Shagarov"],
+
+    "sourcePaths": ["source"],
+    "importPaths": ["source"],
+
+    "preBuildCommands-posix": [
+        "cd \"$PACKAGE_DIR\" && git submodule update --init --quiet",
+        "cd \"$PACKAGE_DIR/extern/geometry-central\" && git submodule update --init --quiet deps/happly",
+        "cmake -S \"$PACKAGE_DIR\" -B \"$PACKAGE_DIR/build\" -DCMAKE_BUILD_TYPE=Release -DGC_BUILD_TESTS=OFF -DGC_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON 2>&1 | tail -5",
+        "cmake --build \"$PACKAGE_DIR/build\" --target gc_c -j4 2>&1 | tail -10"
+    ],
+
+    "lflags-posix": [
+        "-L$PACKAGE_DIR/build",
+        "-L$PACKAGE_DIR/build/extern/geometry-central/src"
+    ],
+
+    "libs-posix": ["gc_c", "geometry-central", "stdc++", "m"],
+
+    "configurations": [
+        {
+            "name": "library",
+            "targetType": "staticLibrary"
+        },
+        {
+            "name": "geodesic",
+            "targetType": "executable",
+            "targetName": "geodesic",
+            "mainSourceFile": "examples/geodesic.d"
+        }
+    ]
+}
