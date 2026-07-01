@@ -19,7 +19,21 @@
         "-L$PACKAGE_DIR/build/extern/geometry-central/src"
     ],
 
-    "libs-posix": ["gc_c", "geometry-central", "stdc++", "m"],
+    "libs-linux": ["gc_c", "geometry-central", "stdc++", "m"],
+    "libs-osx":   ["gc_c", "geometry-central", "c++",    "m"],
+
+    "preBuildCommands-windows": [
+        "git -C \"$PACKAGE_DIR\" submodule update --init --recursive",
+        "cmake -S \"$PACKAGE_DIR\" -B \"$PACKAGE_DIR/build\" -DGC_BUILD_TESTS=OFF -DGC_BUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF",
+        "cmake --build \"$PACKAGE_DIR/build\" --config Release --target gc_c"
+    ],
+
+    "lflags-windows": [
+        "$PACKAGE_DIR/build/Release/gc_c.lib",
+        "$PACKAGE_DIR/build/extern/geometry-central/src/Release/geometry-central.lib"
+    ],
+
+    "dflags-windows": ["-mscrtlib=msvcrt"],
 
     "configurations": [
         {

@@ -15,6 +15,13 @@ set(BUILD_SHARED_LIBS     OFF CACHE BOOL "" FORCE)
 # Let it do its thing; we only need the CPU-side library.
 add_subdirectory(extern/geometry-central EXCLUDE_FROM_ALL)
 
+# ---- MSVC-specific flags ---------------------------------------------------
+# geometry-central + Eigen produce many template instantiations that can
+# exceed MSVC's default section limit; /bigobj raises the cap.
+if(MSVC)
+    target_compile_options(geometry-central PRIVATE /bigobj)
+endif()
+
 # ---- The C shim ------------------------------------------------------------
 add_library(gc_c STATIC csrc/gc_c.cpp)
 target_include_directories(gc_c PUBLIC include)
@@ -22,3 +29,10 @@ target_include_directories(gc_c PUBLIC include)
 # include dirs, so linking against it is sufficient.
 target_link_libraries(gc_c PUBLIC geometry-central)
 set_target_properties(gc_c PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+if(MSVC)
+    # /bigobj in case gc_c.cpp pulls in heavy geometry-central headers
+    target_compile_options(gc_c PRIVATE /bigobj)
+    # Match MSVC math/macro conventions expected by geometry-central headers
+    target_compile_definitions(gc_c PRIVATE _USE_MATH_DEFINES NOMINMAX)
+endif()
